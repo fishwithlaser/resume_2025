@@ -21,32 +21,98 @@ def text_block(
     y,
     w=r"\textwidth",
     h=None,
-    text_size=None,
-    color="black",
-    width="5cm",
+    font_size=None,
+    color=None,
+    font_family=None,
 ):
+    """
+    Places a styled text block in the document.
+
+    Args:
+        doc: The document object (e.g., from pylatex).
+        content: The text content inside the block.
+        x: The x-coordinate (in mm) for positioning the block.
+        y: The y-coordinate (in mm) for positioning the block.
+        w: The width of the block (default is \textwidth).
+        h: The height of the block (optional, not used here).
+        font_size: The size of the text (e.g., "12", "14").
+        color: The text color (default is "black").
+        font_family: The font family command (e.g., "alba", "decomart").
+    """
     doc.append(NoEscape(r"\begin{textblock*}{" + w + r"}" + rf"({x}mm, {y}mm)"))
-    if text_size:
-        doc.append(NoEscape(f"\\{text_size}"))
-    doc.append(content)
+
+    if color:
+        # Expecting color as a tuple (r, g, b), where 0 <= r, g, b <= 1
+        color_rgb = f"{{{color[0]},{color[1]},{color[2]}}}"
+        doc.append(NoEscape(r"\textcolor[rgb]" + color_rgb + r"{"))
+    else:
+        doc.append(NoEscape(r"\textcolor{black}{"))
+    
+    # Add text size if specified (using \fontsize for pt sizes)
+    if font_size:
+        # Example of using \fontsize{size}{baselineskip} for point sizes
+        doc.append(NoEscape(f"\\fontsize{{{font_size}pt}}{{12pt}}\\selectfont "))
+
+    # Apply font family if specified
+    if font_family:
+        doc.append(NoEscape(rf"\{font_family}" + " " + content))
+    else:
+        doc.append(content)
+
+    doc.append(NoEscape(r"}"))
     doc.append(NoEscape(r"\end{textblock*}"))
 
 
-def place_text_block(doc, content, xy, hw):
-    # seems not to be placed in absolute as table messes this up
-    text_content = NoEscape(
-        r"\framebox["
-        + hw[1]
-        + r"]{"
-        + r"\parbox[t]["
-        + hw[0]
-        + r"][t]{"
-        + str(hw[1])
-        + r"}{"
-        + content
-        + r"}}"
-    )
-    text_block(doc, text_content, xy[0], xy[1])
+
+def place_colored_block(doc, xy, hw, color):
+    """
+    Places a colored frame box at specified coordinates in the document.
+
+    Args:
+        doc: The document object (e.g., from pylatex).
+        xy: Tuple (x, y) for absolute positioning on the page (in cm).
+        hw: Tuple (height, width) for the box size (e.g., "2cm", "5cm").
+        color: The background color (e.g., "red", "blue", "yellow").
+    """
+    # Ensure the `textpos` package is included
+    doc.preamble.append(NoEscape(r"\usepackage[absolute,overlay]{textpos}"))
+    # doc.preamble.append(NoEscape(r"\setlength{\TPHorizModule}{1cm}"))
+    # doc.preamble.append(NoEscape(r"\setlength{\TPVertModule}{1cm}"))
+
+    color_code = f"{{{color[0]},{color[1]},{color[2]}}}"
+
+    framebox_code = NoEscape(
+            r"\begin{textblock*}{"
+            + hw[1]
+            + r"}("
+            + str(xy[0])
+            + r"cm,"
+            + str(float(xy[1]) - float(hw[0].replace('cm', '')))
+            + r"cm)"
+            + r"\colorbox[rgb]"
+            + color_code
+            + r"{\framebox["
+            + hw[1]
+            + r"][t]{"
+            + r"\rule{0pt}{"
+            + hw[0]
+            + r"}}}"
+            + r"\end{textblock*}")
+    doc.append(framebox_code)
+
+
+def place_text_block(doc, content, xy, hw, font_family=None, color=None, font_size=12):
+    text_content = NoEscape(r"\framebox[" +
+                            hw[1] +
+                            r"]{" +
+                            r"\parbox[t][" +
+                            hw[0] +
+                            r"][t]{" +
+                            str(hw[1]) +
+                            r"}{" +
+                            content +
+                            r"}}")
+    text_block(doc, text_content, xy[0], xy[1], font_family=font_family, color=color, font_size=font_size)
 
 
 def include_matrix(doc) -> None:
@@ -54,7 +120,7 @@ def include_matrix(doc) -> None:
         i_1 = i * 10
         for j in range(-5, 40):
             j_1 = j * 10
-            text_block(doc, f"{(i_1, j_1)}", i_1, j_1, text_size="tiny")
+            text_block(doc, f"{(i_1, j_1)}", i_1, j_1, font_size=6, color=(0.9, 0.9, 0.9))
 
 
 def include_image(
