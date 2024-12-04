@@ -1,3 +1,4 @@
+from datetime import date
 from data import personal_stuff, work_entries
 
 from pylatex import Document, NoEscape
@@ -5,6 +6,7 @@ from pylatex import Document, NoEscape
 from latex_tools import include_matrix, place_colored_block, place_text_block, place_colored_block
 
 BOXES_FRAMES = False #good for debugging
+ADD_FUN = False #good for fun, bad for jobs
 
 ALBA='alba'
 DECOMART='decomart'
@@ -18,10 +20,16 @@ FONT_FAMILIES = {
     FUTURA: 'FuturaStdBook.ttf',
 }
 
+BLACK = (0, 0, 0)
+WHITE = (1, 1, 1)
 PRIMARY_RED = (0.8, 0.0, 0.0)
 PRIMARY_BLUE = (0.0, 0.2, 0.8)
 PRIMARY_YELLOW = (1.0, 0.87, 0.2)
 PRIMARY_GREY = (0.66, 0.66, 0.66)
+PRIMARY_GREEN = (0.0, 0.8, 0.0)
+PRIMARY_CYAN = (0.0, 0.8, 0.8)
+BEIGE = (0.96, 0.96, 0.86)
+BROWN = (0.6, 0.4, 0.08)
 
 def generate_grid_with_coordinates(filename="grid_with_coordinates.pdf", grid_size=(10, 10), cell_size=(1, 1)):
     """
@@ -62,28 +70,44 @@ def generate_grid_with_coordinates(filename="grid_with_coordinates.pdf", grid_si
     address = f"A: {personal_stuff['address']}"
     phone = f"E: {personal_stuff['email']}"
 
+    if ADD_FUN:
+        place_colored_block(doc, (20,2.5), ('2cm', '2cm'), PRIMARY_BLUE)
+        place_colored_block(doc, (17,2.5), ('2cm', '2cm'), PRIMARY_YELLOW)
+        place_colored_block(doc, (13,2.5), ('2cm', '2cm'), PRIMARY_GREEN)
+        place_colored_block(doc, (8,2.5), ('2cm', '2cm'), PRIMARY_CYAN)
+        place_colored_block(doc, (2,2.5), ('2cm', '2cm'), BEIGE)
 
-    place_colored_block(doc, (0,1.25), ('0.5cm', '12cm'), (0.1,0.1,0.1))
+    #NAME BLOCK
+    place_colored_block(doc, (-2,3), ('0.5cm', '12cm'), PRIMARY_GREY)
+    place_colored_block(doc, (0,5), ('0.5cm', '12cm'), BLACK)
+    place_text_block(doc, name_string, (7,4), ('0.5cm', '13cm'), font_family=DECOMART, color=WHITE, font_size='24')
 
-    place_text_block(doc, name_string, (10,10), ('0.5cm', '13cm'), font_family=DECOMART, color=PRIMARY_GREY, font_size='24')
-    place_text_block(doc, address, (130,10), ('0.5cm', '6cm'), font_family=FUTURA, color=PRIMARY_RED, font_size='10')
-    place_text_block(doc, phone, (130,13), ('0.5cm', '6cm'), font_family=FUTURA, color=PRIMARY_RED, font_size='10')
+
+    place_text_block(doc, address, (133,10), ('0.5cm', '6cm'), font_family=FUTURA, color=PRIMARY_RED, font_size='10')
+    place_text_block(doc, phone, (133,13), ('0.5cm', '6cm'), font_family=FUTURA, color=PRIMARY_RED, font_size='10')
     
 
     last_employer = None
-    x = 23
+    x = 18
     place_text_block(doc, "Work Experience", (0, x), ('0.5cm', '5cm'), font_family=FUTURA, color=PRIMARY_RED, font_size='16')
     x += 5
     for entry in work_entries:
         if entry['name'] != last_employer:
             x += 5
-            place_text_block(doc, entry['name'], (10, x), ('0.5cm', '10cm'), font_family=FUTURA, color=PRIMARY_GREY, font_size='14')
-            x += 5
+            place_colored_block(doc, (0,x), ('0.25cm', '12cm'), PRIMARY_BLUE)
+            place_text_block(doc, entry['name'], (5, x), ('0.5cm', '12cm'), font_family=DECOMART, color=PRIMARY_GREY, font_size='16')
+            x += 6
             place_text_block(doc, entry['location'], (10, x), ('0.5cm', '10cm'), font_family=FUTURA, color=PRIMARY_GREY, font_size='10')
             last_employer = entry['name']
             x += 4
 
         place_text_block(doc, entry['position'], (10, x), ('0.5cm', '10cm'), font_family=FUTURA, color=PRIMARY_RED, font_size='10')
+        place_text_block(doc, f"{entry['start_date'].strftime('%b, %Y')} -", (80, x), ('0.5cm', '10cm'), font_family=FUTURA, color=PRIMARY_RED, font_size='10')
+        if entry['end_date'] == date.max:
+            place_text_block(doc, 'Present', (105, x), ('0.5cm', '10cm'), font_family=FUTURA, color=PRIMARY_RED, font_size='10')
+        else:
+            place_text_block(doc, entry['end_date'].strftime('%b, %Y'), (100, x), ('0.5cm', '10cm'), font_family=FUTURA, color=PRIMARY_RED, font_size='10')
+
         x += 5
 
         for entry, line_guess in entry['bullets']:

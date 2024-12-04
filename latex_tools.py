@@ -82,23 +82,24 @@ def place_colored_block(doc, xy, hw, color):
     color_code = f"{{{color[0]},{color[1]},{color[2]}}}"
 
     framebox_code = NoEscape(
-            r"\begin{textblock*}{"
-            + hw[1]
-            + r"}("
-            + str(xy[0])
-            + r"cm,"
-            + str(float(xy[1]) - float(hw[0].replace('cm', '')))
-            + r"cm)"
-            + r"\colorbox[rgb]"
-            + color_code
-            + r"{\framebox["
-            + hw[1]
-            + r"][t]{"
-            + r"\rule{0pt}{"
-            + hw[0]
-            + r"}}}"
-            + r"\end{textblock*}")
+    r"\begin{textblock*}{"  # Start textblock definition
+    + hw[1]  # Width of the box
+    + r"}("
+    + str(xy[0]/10)  # X-coordinate remains unchanged
+    + r"cm,"
+    + str(xy[1]/10)  # Y-coordinate now corresponds to the top-left corner
+    + r"cm)"
+    + r"\colorbox[rgb]"
+    + color_code  # Color of the framebox
+    + r"{\framebox["  # Start framebox
+    + hw[1]  # Specify width
+    + r"][t]{"
+    + r"\rule{0pt}{"  # Rule to define height
+    + hw[0]  # Specify height
+    + r"}}}"
+    + r"\end{textblock*}")  # End textblock definition
     doc.append(framebox_code)
+
 
 
 def place_text_block(doc, content, xy, hw, font_family=None, color=None, font_size=12):
