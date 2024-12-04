@@ -32,14 +32,14 @@ work_entries: list[WorkEntry] = [
         end_date=date(2025, 1, 1),
         location="Toronto, On., Canada",
         bullets=[
-            # compliance
-            # trade alerts
-            # algo trading tools
-            ("Responsible for the success of 100M of daily trades; availability of all previous days’ trades (TSX and NYSE); and the real-time transaction data of our customers", 3),
-            ("Plan, and implement and/or delegate features, infrastructure, and products  with org-wide impact", 2),
-            ("Mentor underperforming engineers to achieve outstanding performance evaluations through mentorship", 2),
-            ("Lead integration of observability platforms", 1),
-        ],
+            ("Ensured the success of 100M in daily trades by maintaining the availability of all previous days’ trades across TSX and NYSE.", 2),
+            ("Developed and maintained advanced algorithmic trading tools, enabling high-speed, data-driven trading decisions.", 2),
+            ("Built real-time trade alert systems to enhance market responsiveness and operational efficiency.", 2),
+            ("Designed and deployed compliance tools, improving adherence to regulatory requirements and audit readiness.", 2),
+            ("Built real-time trade alert systems to enhance market responsiveness and operational efficiency.", 2),
+            ("Mentored underperforming engineers, resulting in significant improvements in technical skills and performance evaluations.", 2),
+            ("Led by example, fostering a collaborative and growth-focused engineering culture.", 2),
+            ],
         tools=[],
     ),
     WorkEntry(
