@@ -1,5 +1,5 @@
 from datetime import date
-from typing import TypedDict, Optional
+from typing import TypedDict, Optional, List
 
 class PersonalStuff(TypedDict):
     first_name: str
@@ -16,3 +16,11 @@ class WorkEntry(TypedDict):
     bullets: list[str]
     tools: list[str]
     location: str
+
+class SubCategory(TypedDict):
+    subcategory: str
+    items: List[str]
+
+class SkillCategory(TypedDict):
+    category: str
+    skills: List[SubCategory]
